@@ -5,6 +5,10 @@ body {
 }
 
 .container {
+    /* ... 既存のスタイル ... */
+    max-width: 600px; /* ここは既存でOK */
+    width: 100%; /* 画面幅いっぱいに広がるように設定 */
+    /* ... 既存のスタイル ... */
     max-width: 600px;
     margin: 0 auto;
     background: white;
@@ -67,4 +71,50 @@ button:hover {
     font-size: 1.2em;
     font-weight: bold;
     color: #28a745; /* 結果の色を強調 */
+}
+/* ========================================= */
+/* 📱 モバイル対応 (最大画面幅 600px) */
+/* ========================================= */
+@media (max-width: 600px) {
+    
+    /* 1. コンテナのパディングを調整 */
+    .container {
+        padding: 15px; /* パディングを減らす */
+        box-shadow: none; /* スマホでは影を削除し、フル画面表示に近づける */
+    }
+
+    /* 2. 入力グループの配置を変更 */
+    /* 入力項目を縦に並べるように調整 */
+    .input-group {
+        flex-direction: column; /* 要素を縦に並べる */
+        align-items: flex-start; /* 左寄せにする */
+        margin-bottom: 20px;
+    }
+
+    /* ラベルのスタイル調整 */
+    .input-group label {
+        margin-bottom: 5px; /* ラベルと入力欄の間にスペース */
+        font-weight: bold;
+        width: 100%; /* 幅をいっぱいに広げる */
+    }
+
+    /* 入力欄のスタイル調整 */
+    .input-group input {
+        width: 100%; /* 入力欄の幅をいっぱいに広げる */
+        box-sizing: border-box; /* パディングやボーダーを幅に含める */
+    }
+
+    /* 3. 結果表示の配置を変更 */
+    .result-box {
+        flex-direction: column; /* 結果表示も縦に並べる */
+        align-items: flex-start;
+        margin-bottom: 20px;
+    }
+
+    /* 結果の文字サイズを調整 */
+    .output {
+        font-size: 1.5em; /* 結果の文字を大きくする */
+        margin-top: 5px;
+    }
+
 }
