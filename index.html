@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta
     name="description"
-    content="箱物のシール台紙枚数を、外箱1枚固定・中身2/8/10個入り・9/10/12枚綴りに対応して計算するツールです。"
+    content="外箱1枚固定、中箱2/8/10枚対応。綴り9/10/12、任意入力対応。分数表示のシール台紙計算ツール。"
   />
 
   <style>
@@ -197,7 +197,7 @@
   <div class="app">
     <header class="app-header">
       <h1>箱物シール台紙計算</h1>
-      <p class="app-subtitle">外箱1枚固定・中身2/8/10個入り対応ツール</p>
+      <p class="app-subtitle">外箱1固定／中箱2・8・10＋任意対応</p>
     </header>
 
     <main>
@@ -205,8 +205,7 @@
       <section class="card">
         <h2>基本入力</h2>
         <div class="field">
-          <label for="totalBoxes">箱の総数（パレットに乗っている箱数）</label>
-          <!-- デフォルト 100 -->
+          <label for="totalBoxes">箱の総数</label>
           <input id="totalBoxes" type="number" inputmode="numeric" value="100" />
         </div>
       </section>
@@ -216,16 +215,15 @@
         <h2>外箱用シール</h2>
         <div class="field">
           <label>箱あたり枚数</label>
-          <div class="note">1枚固定（外箱に1枚貼る前提）</div>
+          <div class="note">1枚固定</div>
         </div>
         <div class="field">
-          <label for="outerPerSheet">台紙の綴り枚数</label>
+          <label for="outerPerSheet">綴り枚数</label>
           <select id="outerPerSheet">
-            <!-- デフォルト 12綴り -->
             <option value="12" selected>12枚綴り</option>
             <option value="10">10枚綴り</option>
             <option value="9">9枚綴り</option>
-            <option value="">なし（外箱シールを使わない）</option>
+            <option value="">なし</option>
           </select>
         </div>
       </section>
@@ -233,24 +231,32 @@
       <!-- 中箱シール -->
       <section class="card">
         <h2>中箱用シール</h2>
+
         <div class="field">
-          <label for="innerPerBox">箱あたり枚数（中身の個数）</label>
-          <select id="innerPerBox">
-            <!-- デフォルト 2個入り -->
-            <option value="2" selected>2枚（2個入り）</option>
-            <option value="8">8枚（8個入り）</option>
-            <option value="10">10枚（10個入り）</option>
+          <label for="innerPerBoxSelect">箱あたり枚数（中身）</label>
+          <select id="innerPerBoxSelect">
+            <option value="2" selected>2個入り</option>
+            <option value="8">8個入り</option>
+            <option value="10">10個入り</option>
+            <option value="custom">任意入力</option>
           </select>
         </div>
+
+        <!-- 任意入力欄 -->
+        <div class="field" id="customInnerField" style="display:none;">
+          <label for="innerPerBox">任意の枚数</label>
+          <input id="innerPerBox" type="number" inputmode="numeric" value="2" />
+        </div>
+
         <div class="field">
-          <label for="innerPerSheet">台紙の綴り枚数</label>
+          <label for="innerPerSheet">綴り枚数</label>
           <select id="innerPerSheet">
-            <!-- デフォルト 10綴り -->
             <option value="10" selected>10枚綴り</option>
             <option value="12">12枚綴り</option>
             <option value="9">9枚綴り</option>
           </select>
         </div>
+
       </section>
 
       <div class="action">
@@ -273,59 +279,66 @@
   </div>
 
   <script>
-    // totalLabels / perSheet を、整数＋分数＋小数で表示
+    const innerSelect = document.getElementById("innerPerBoxSelect");
+    const customField = document.getElementById("customInnerField");
+    const innerInput = document.getElementById("innerPerBox");
+
+    innerSelect.addEventListener("change", () => {
+      if (innerSelect.value === "custom") {
+        customField.style.display = "block";
+        innerInput.focus();
+      } else {
+        customField.style.display = "none";
+      }
+    });
+
+    // totalLabels / perSheet → 分数表示
     function computeSheets(totalLabels, perSheet) {
       if (perSheet <= 0 || totalLabels <= 0) {
-        return {
-          main: "0 枚",
-          sub: ""
-        };
+        return { main: "0 枚", sub: "" };
       }
 
-      const sheets = totalLabels / perSheet;           // 理論シート枚数
-      const whole = Math.floor(sheets);                // 完全に使う台紙枚数
-      const remainderLabels = totalLabels % perSheet;  // 余りラベル枚数
+      const sheets = totalLabels / perSheet;
+      const whole = Math.floor(sheets);
+      const remainderLabels = totalLabels % perSheet;
 
       if (remainderLabels === 0) {
-        return {
-          main: `${whole} 枚`,
-          sub: ""   // ぴったりなので分数表示なし
-        };
+        return { main: `${whole} 枚`, sub: "" };
       }
 
-      const decimal = sheets.toFixed(3).replace(/\.?0+$/, ""); // 小数は参考用
+      const decimal = sheets.toFixed(3).replace(/\.?0+$/, "");
 
       return {
         main: `${whole} 枚 と ${remainderLabels}/${perSheet} 枚`,
-        sub: `= 約 ${decimal} 枚（台紙 ${perSheet}枚綴りベース）`
+        sub: `= 約 ${decimal} 枚（綴り${perSheet}枚基準）`
       };
     }
 
     document.getElementById("calcButton").addEventListener("click", () => {
       const total = Number(document.getElementById("totalBoxes").value) || 0;
 
-      // 外箱
-      const outerPerBox = 1; // 外箱は1枚固定
+      // 外箱（1枚固定）
       const outerSheetValue = document.getElementById("outerPerSheet").value;
-
       if (outerSheetValue === "") {
-        // 外箱シールなし
         document.getElementById("outerResultMain").textContent = "0 枚";
         document.getElementById("outerResultSub").textContent = "";
       } else {
-        const outerPerSheet = Number(outerSheetValue);
-        const outerTotalLabels = total * outerPerBox;
-
-        const outer = computeSheets(outerTotalLabels, outerPerSheet);
+        const outerTotalLabels = total * 1;
+        const outer = computeSheets(outerTotalLabels, Number(outerSheetValue));
         document.getElementById("outerResultMain").textContent = outer.main;
         document.getElementById("outerResultSub").textContent = outer.sub;
       }
 
       // 中箱
-      const innerPerBox = Number(document.getElementById("innerPerBox").value) || 0;
-      const innerPerSheet = Number(document.getElementById("innerPerSheet").value) || 10;
+      let innerPerBox;
+      if (innerSelect.value === "custom") {
+        innerPerBox = Number(innerInput.value) || 0;
+      } else {
+        innerPerBox = Number(innerSelect.value);
+      }
 
       const innerTotalLabels = total * innerPerBox;
+      const innerPerSheet = Number(document.getElementById("innerPerSheet").value) || 10;
       const inner = computeSheets(innerTotalLabels, innerPerSheet);
 
       document.getElementById("innerResultMain").textContent = inner.main;
