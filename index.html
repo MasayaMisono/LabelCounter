@@ -1,62 +1,336 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-   <meta charset="UTF-8">
-    <title>汎用シール台紙計算ツール</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <title>箱物シール台紙計算</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta
+    name="description"
+    content="箱物のシール台紙枚数を、外箱1枚固定・中身2/8/10個入り・9/10/12枚綴りに対応して計算するツールです。"
+  />
+
+  <style>
+    :root {
+      --bg: #f3f4f6;
+      --card-bg: #ffffff;
+      --accent: #2563eb;
+      --accent-soft: #dbeafe;
+      --text-main: #111827;
+      --text-sub: #6b7280;
+      --border-soft: #e5e7eb;
+      --radius-lg: 16px;
+      --shadow-soft: 0 10px 25px rgba(15, 23, 42, 0.08);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+    }
+
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    /* ヘッダー */
+    .app-header {
+      padding: 16px 4px 8px;
+    }
+
+    .app-header h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin: 0 0 4px;
+    }
+
+    .app-subtitle {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--text-sub);
+    }
+
+    /* カード */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 16px 14px;
+      margin-top: 12px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+    }
+
+    .card h2 {
+      font-size: 1rem;
+      margin: 0 0 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    /* フィールド */
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+
+    .field label {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+    }
+
+    .field input[type="number"],
+    .field select {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border-soft);
+      font-size: 1rem;
+      outline: none;
+      background: #f9fafb;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft);
+      background: #ffffff;
+    }
+
+    .note {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+    }
+
+    /* ボタン */
+    .action {
+      margin-top: 16px;
+      text-align: center;
+    }
+
+    .action button {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 999px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #ffffff;
+      background: var(--accent);
+      cursor: pointer;
+      box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+      transition: transform 0.08s ease, box-shadow 0.08s ease,
+        opacity 0.1s ease;
+    }
+
+    .action button:active {
+      transform: translateY(1px);
+      box-shadow: 0 6px 14px rgba(37, 99, 235, 0.24);
+      opacity: 0.95;
+    }
+
+    /* 結果カード */
+    .result-card {
+      margin-top: 16px;
+    }
+
+    .result-card p {
+      margin: 4px 0;
+      font-size: 0.95rem;
+    }
+
+    .result-label {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      margin-bottom: 2px;
+    }
+
+    .result-main {
+      font-weight: 600;
+    }
+
+    .fraction {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+    }
+
+    /* ダークモード対応 */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #020617;
+        --card-bg: #0f172a;
+        --text-main: #e5e7eb;
+        --text-sub: #9ca3af;
+        --border-soft: #1f2937;
+        --accent-soft: rgba(37, 99, 235, 0.3);
+      }
+
+      body {
+        background: radial-gradient(circle at top, #0b1120, #020617 60%);
+      }
+
+      .card {
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+      }
+
+      .field input[type="number"],
+      .field select {
+        background: #020617;
+        border-color: #1f2937;
+        color: var(--text-main);
+      }
+    }
+  </style>
 </head>
+
 <body>
-    <div class="container">
-        <h2>📦箱物シール台紙計算📦</h2>
-        
-        <section class="inputs">
-            <h2>基本入力</h2>
-            <div class="input-group">
-                <label for="input-N">箱の総数（パレットに乗ってる個数）　:</label>
-                <input type="number" id="input-N" value="100" min="1">
-            </div>
-            
-            <hr>
+  <div class="app">
+    <header class="app-header">
+      <h1>箱物シール台紙計算</h1>
+      <p class="app-subtitle">外箱1枚固定・中身2/8/10個入り対応ツール</p>
+    </header>
 
-            <h2>外箱用シール</h2>
-            <div class="input-group">
-                <label for="input-COut">箱あたり枚数（だいたい1枚） :</label>
-                <input type="number" id="input-COut" value="1" min="1">
-            </div>
-            <div class="input-group">
-                <label for="input-SOut">シール台紙の綴り枚数（外カット数） :</label>
-                <input type="number" id="input-SOut" value="12" min="1">
-            </div>
+    <main>
+      <!-- 基本 -->
+      <section class="card">
+        <h2>基本入力</h2>
+        <div class="field">
+          <label for="totalBoxes">箱の総数（パレットに乗っている箱数）</label>
+          <!-- デフォルト 100 -->
+          <input id="totalBoxes" type="number" inputmode="numeric" value="100" />
+        </div>
+      </section>
 
-            <hr>
+      <!-- 外箱シール -->
+      <section class="card">
+        <h2>外箱用シール</h2>
+        <div class="field">
+          <label>箱あたり枚数</label>
+          <div class="note">1枚固定（外箱に1枚貼る前提）</div>
+        </div>
+        <div class="field">
+          <label for="outerPerSheet">台紙の綴り枚数</label>
+          <select id="outerPerSheet">
+            <!-- デフォルト 12綴り -->
+            <option value="12" selected>12枚綴り</option>
+            <option value="10">10枚綴り</option>
+            <option value="9">9枚綴り</option>
+            <option value="">なし（外箱シールを使わない）</option>
+          </select>
+        </div>
+      </section>
 
-            <h2>中箱用シール</h2>
-            <div class="input-group">
-                <label for="input-CIn">箱あたり枚数 （何個入りか）:</label>
-                <input type="number" id="input-CIn" value="2" min="1">
-            </div>
-            <div class="input-group">
-                <label for="input-SIn">シール台紙の綴り枚数（中カット数） :</label>
-                <input type="number" id="input-SIn" value="10" min="1">
-            </div>
+      <!-- 中箱シール -->
+      <section class="card">
+        <h2>中箱用シール</h2>
+        <div class="field">
+          <label for="innerPerBox">箱あたり枚数（中身の個数）</label>
+          <select id="innerPerBox">
+            <!-- デフォルト 2個入り -->
+            <option value="2" selected>2枚（2個入り）</option>
+            <option value="8">8枚（8個入り）</option>
+            <option value="10">10枚（10個入り）</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="innerPerSheet">台紙の綴り枚数</label>
+          <select id="innerPerSheet">
+            <!-- デフォルト 10綴り -->
+            <option value="10" selected>10枚綴り</option>
+            <option value="12">12枚綴り</option>
+            <option value="9">9枚綴り</option>
+          </select>
+        </div>
+      </section>
 
-            <button onclick="runCalculation()">計算実行</button>
-        </section>
+      <div class="action">
+        <button id="calcButton">計算する</button>
+      </div>
 
-        <section class="results">
-            <h2>結果</h2>
-            <div class="result-box">
-                <p><strong>外箱用シール台紙:</strong></p>
-                <p id="result-TOut" class="output">0 枚</p>
-            </div>
-            <div class="result-box">
-                <p><strong>中箱用シール台紙:</strong></p>
-                <p id="result-TIn" class="output">0 枚</p>
-            </div>
-        </section>
-    </div>
+      <!-- 結果 -->
+      <section class="card result-card">
+        <h2>結果</h2>
 
-    <script src="script.js"></script>
+        <p class="result-label">外箱用シール台紙</p>
+        <p class="result-main" id="outerResultMain">0 枚</p>
+        <p class="fraction" id="outerResultSub"></p>
+
+        <p class="result-label" style="margin-top:12px;">中箱用シール台紙</p>
+        <p class="result-main" id="innerResultMain">0 枚</p>
+        <p class="fraction" id="innerResultSub"></p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // totalLabels / perSheet を、整数＋分数＋小数で表示
+    function computeSheets(totalLabels, perSheet) {
+      if (perSheet <= 0 || totalLabels <= 0) {
+        return {
+          main: "0 枚",
+          sub: ""
+        };
+      }
+
+      const sheets = totalLabels / perSheet;           // 理論シート枚数
+      const whole = Math.floor(sheets);                // 完全に使う台紙枚数
+      const remainderLabels = totalLabels % perSheet;  // 余りラベル枚数
+
+      if (remainderLabels === 0) {
+        return {
+          main: `${whole} 枚`,
+          sub: ""   // ぴったりなので分数表示なし
+        };
+      }
+
+      const decimal = sheets.toFixed(3).replace(/\.?0+$/, ""); // 小数は参考用
+
+      return {
+        main: `${whole} 枚 と ${remainderLabels}/${perSheet} 枚`,
+        sub: `= 約 ${decimal} 枚（台紙 ${perSheet}枚綴りベース）`
+      };
+    }
+
+    document.getElementById("calcButton").addEventListener("click", () => {
+      const total = Number(document.getElementById("totalBoxes").value) || 0;
+
+      // 外箱
+      const outerPerBox = 1; // 外箱は1枚固定
+      const outerSheetValue = document.getElementById("outerPerSheet").value;
+
+      if (outerSheetValue === "") {
+        // 外箱シールなし
+        document.getElementById("outerResultMain").textContent = "0 枚";
+        document.getElementById("outerResultSub").textContent = "";
+      } else {
+        const outerPerSheet = Number(outerSheetValue);
+        const outerTotalLabels = total * outerPerBox;
+
+        const outer = computeSheets(outerTotalLabels, outerPerSheet);
+        document.getElementById("outerResultMain").textContent = outer.main;
+        document.getElementById("outerResultSub").textContent = outer.sub;
+      }
+
+      // 中箱
+      const innerPerBox = Number(document.getElementById("innerPerBox").value) || 0;
+      const innerPerSheet = Number(document.getElementById("innerPerSheet").value) || 10;
+
+      const innerTotalLabels = total * innerPerBox;
+      const inner = computeSheets(innerTotalLabels, innerPerSheet);
+
+      document.getElementById("innerResultMain").textContent = inner.main;
+      document.getElementById("innerResultSub").textContent = inner.sub;
+    });
+  </script>
 </body>
 </html>
