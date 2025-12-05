@@ -1,20 +1,23 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
-    padding: 20px;
+    /* 灰色を白に変更（これで「グレーの枠」が消えます） */
+    background-color: white; 
+    padding: 0; /* bodyのパディングも削除し、完全に画面いっぱいに */
+    margin: 0;
 }
 
 .container {
-    /* ... 既存のスタイル ... */
-    max-width: 600px; /* ここは既存でOK */
-    width: 100%; /* 画面幅いっぱいに広がるように設定 */
-    /* ... 既存のスタイル ... */
-    max-width: 600px;
-    margin: 0 auto;
-    background: white;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* 画面いっぱいに広げる */
+    width: 100%;
+    max-width: none; /* 最大幅の制限をなくす */
+    margin: 0; /* 中央寄せを解除 */
+    /* 枠や影を消す */
+    background: none; /* 白い背景を削除 */
+    border-radius: 0; /* 角丸を削除 */
+    box-shadow: none; /* 影を削除 */
+    /* 上下のパディングは、コンテンツが画面端につきすぎないように適宜調整してください */
+    padding: 50px 20px; 
+    box-sizing: border-box;
 }
 
 h1 {
