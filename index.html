@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta
     name="description"
-    content="外箱1枚固定、中箱2/8/10枚対応。綴り9/10/12、任意入力対応。分数表示のシール台紙計算ツール。By CAPTAIN"
+    content="外箱1枚固定、中身2/8/10枚対応。綴り9/10/12、任意入力対応。分数表示のシール台紙計算ツール。By CAPTAIN"
   />
 
   <style>
@@ -197,7 +197,7 @@
   <div class="app">
     <header class="app-header">
       <h1>エーオーアイ箱物シール計算</h1>
-      <p class="app-subtitle">外箱1固定／中箱2・8・10＋任意対応 By CAPTAIN</p>
+      <p class="app-subtitle">外箱1固定／中身2・8・10＋任意対応 By CAPTAIN</p>
     </header>
 
     <main>
@@ -228,9 +228,9 @@
         </div>
       </section>
 
-      <!-- 中箱シール -->
+      <!-- 中身シール -->
       <section class="card">
-        <h2>中箱用シール</h2>
+        <h2>中身用シール</h2>
 
         <div class="field">
           <label for="innerPerBoxSelect">箱あたり枚数（中身）</label>
@@ -244,7 +244,7 @@
 
         <!-- 任意入力欄 -->
         <div class="field" id="customInnerField" style="display:none;">
-          <label for="innerPerBox">任意の枚数</label>
+          <label for="innerPerBox">任意の個数</label>
           <input id="innerPerBox" type="number" inputmode="numeric" value="2" />
         </div>
 
@@ -271,7 +271,7 @@
         <p class="result-main" id="outerResultMain">0 枚</p>
         <p class="fraction" id="outerResultSub"></p>
 
-        <p class="result-label" style="margin-top:12px;">中箱用シール台紙</p>
+        <p class="result-label" style="margin-top:12px;">中身用シール台紙</p>
         <p class="result-main" id="innerResultMain">0 枚</p>
         <p class="fraction" id="innerResultSub"></p>
       </section>
@@ -329,7 +329,7 @@
         document.getElementById("outerResultSub").textContent = outer.sub;
       }
 
-      // 中箱
+      // 中身
       let innerPerBox;
       if (innerSelect.value === "custom") {
         innerPerBox = Number(innerInput.value) || 0;
