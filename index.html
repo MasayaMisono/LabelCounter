@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>汎用シール台紙計算ツール</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>📦 シール台紙 必要枚数計算ツール</h1>
+        
+        <section class="inputs">
+            <h2>基本入力</h2>
+            <div class="input-group">
+                <label for="input-N">箱の総数 ($N$):</label>
+                <input type="number" id="input-N" value="100" min="1">
+            </div>
+            
+            <hr>
+
+            <h2>外箱用シール (大)</h2>
+            <div class="input-group">
+                <label for="input-COut">箱あたり枚数 ($C_{Out}$):</label>
+                <input type="number" id="input-COut" value="1" min="1">
+            </div>
+            <div class="input-group">
+                <label for="input-SOut">台紙の綴り枚数 ($S_{Out}$):</label>
+                <input type="number" id="input-SOut" value="12" min="1">
+            </div>
+
+            <hr>
+
+            <h2>中箱用シール (小)</h2>
+            <div class="input-group">
+                <label for="input-CIn">箱あたり枚数 ($C_{In}$):</label>
+                <input type="number" id="input-CIn" value="2" min="1">
+            </div>
+            <div class="input-group">
+                <label for="input-SIn">台紙の綴り枚数 ($S_{In}$):</label>
+                <input type="number" id="input-SIn" value="10" min="1">
+            </div>
+
+            <button onclick="runCalculation()">計算実行</button>
+        </section>
+
+        <section class="results">
+            <h2>結果</h2>
+            <div class="result-box">
+                <p><strong>外箱用台紙:</strong></p>
+                <p id="result-TOut" class="output">0 枚</p>
+            </div>
+            <div class="result-box">
+                <p><strong>中箱用台紙:</strong></p>
+                <p id="result-TIn" class="output">0 枚</p>
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
