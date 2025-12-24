@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta
     name="description"
-    content="外箱1枚固定、中身2/8/10枚対応。綴り9/10/12、任意入力対応。分数表示のシール台紙計算ツール。By CAPTAIN"
+    content="外箱1枚固定、中身2/8/10枚対応。綴り9/10/12/8、任意入力対応。分数表示のシール台紙計算ツール。By CAPTAIN"
   />
 
   <style>
@@ -42,7 +42,6 @@
       margin: 0 auto;
     }
 
-    /* ヘッダー */
     .app-header {
       padding: 16px 4px 8px;
     }
@@ -59,7 +58,6 @@
       color: var(--text-sub);
     }
 
-    /* カード */
     .card {
       background: var(--card-bg);
       border-radius: var(--radius-lg);
@@ -76,7 +74,6 @@
       border-bottom: 1px solid var(--border-soft);
     }
 
-    /* フィールド */
     .field {
       display: flex;
       flex-direction: column;
@@ -111,7 +108,6 @@
       color: var(--text-sub);
     }
 
-    /* ボタン */
     .action {
       margin-top: 16px;
       text-align: center;
@@ -139,7 +135,6 @@
       opacity: 0.95;
     }
 
-    /* 結果カード */
     .result-card {
       margin-top: 16px;
     }
@@ -164,7 +159,6 @@
       color: var(--text-sub);
     }
 
-    /* ダークモード対応 */
     @media (prefers-color-scheme: dark) {
       :root {
         --bg: #020617;
@@ -223,6 +217,7 @@
             <option value="12" selected>12枚綴り</option>
             <option value="10">10枚綴り</option>
             <option value="9">9枚綴り</option>
+            <option value="8">8枚綴り</option>
             <option value="">なし</option>
           </select>
         </div>
@@ -242,7 +237,6 @@
           </select>
         </div>
 
-        <!-- 任意入力欄 -->
         <div class="field" id="customInnerField" style="display:none;">
           <label for="innerPerBox">任意の個数</label>
           <input id="innerPerBox" type="number" inputmode="numeric" value="2" />
@@ -254,6 +248,7 @@
             <option value="10" selected>10枚綴り</option>
             <option value="12">12枚綴り</option>
             <option value="9">9枚綴り</option>
+            <option value="8">8枚綴り</option>
           </select>
         </div>
 
@@ -292,7 +287,6 @@
       }
     });
 
-    // totalLabels / perSheet → 分数表示
     function computeSheets(totalLabels, perSheet) {
       if (perSheet <= 0 || totalLabels <= 0) {
         return { main: "0 枚", sub: "" };
@@ -317,7 +311,6 @@
     document.getElementById("calcButton").addEventListener("click", () => {
       const total = Number(document.getElementById("totalBoxes").value) || 0;
 
-      // 外箱（1枚固定）
       const outerSheetValue = document.getElementById("outerPerSheet").value;
       if (outerSheetValue === "") {
         document.getElementById("outerResultMain").textContent = "0 枚";
@@ -329,7 +322,6 @@
         document.getElementById("outerResultSub").textContent = outer.sub;
       }
 
-      // 中身
       let innerPerBox;
       if (innerSelect.value === "custom") {
         innerPerBox = Number(innerInput.value) || 0;
