@@ -1,341 +1,636 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <title>エーオーアイ箱物シール計算</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta
-    name="description"
-    content="外箱1枚固定、中身2/8/10枚対応。綴り9/10/12/8、任意入力対応。分数表示のシール台紙計算ツール。By CAPTAIN"
-  />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LABEL COUNTER — エーオーアイ箱物シール計算</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+JP:wght@300;400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0e0e;
+    --surface: #161616;
+    --surface2: #1e1e1e;
+    --border: #2a2a2a;
+    --border-active: #555;
+    --text: #e8e8e8;
+    --text-dim: #666;
+    --text-mid: #999;
+    --accent: #f0c040;
+    --accent-dim: rgba(240,192,64,0.12);
+    --red: #e05050;
+    --mono: 'DM Mono', monospace;
+    --sans: 'Noto Sans JP', sans-serif;
+    --display: 'Bebas Neue', sans-serif;
+  }
 
-  <style>
-    :root {
-      --bg: #f3f4f6;
-      --card-bg: #ffffff;
-      --accent: #2563eb;
-      --accent-soft: #dbeafe;
-      --text-main: #111827;
-      --text-sub: #6b7280;
-      --border-soft: #e5e7eb;
-      --radius-lg: 16px;
-      --shadow-soft: 0 10px 25px rgba(15, 23, 42, 0.08);
-    }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-    }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 16px 80px;
+  }
 
-    body {
-      margin: 0;
-      padding: 16px;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
-      background: var(--bg);
-      color: var(--text-main);
-    }
+  /* ── HEADER ── */
+  header {
+    width: 100%;
+    max-width: 540px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 20px;
+    margin-bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
 
-    .app {
-      max-width: 480px;
-      margin: 0 auto;
-    }
+  .header-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
 
-    .app-header {
-      padding: 16px 4px 8px;
-    }
+  .header-title {
+    font-family: var(--display);
+    font-size: 42px;
+    letter-spacing: 0.06em;
+    line-height: 1;
+    color: var(--text);
+  }
 
-    .app-header h1 {
-      font-size: 1.4rem;
-      font-weight: 700;
-      margin: 0 0 4px;
-    }
+  .header-sub {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 300;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+    margin-top: 6px;
+  }
 
-    .app-subtitle {
-      margin: 0;
-      font-size: 0.85rem;
-      color: var(--text-sub);
-    }
+  /* ── MAIN ── */
+  main {
+    width: 100%;
+    max-width: 540px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
 
-    .card {
-      background: var(--card-bg);
-      border-radius: var(--radius-lg);
-      padding: 16px 14px;
-      margin-top: 12px;
-      box-shadow: var(--shadow-soft);
-      border: 1px solid rgba(148, 163, 184, 0.18);
-    }
+  /* ── SECTION ── */
+  .section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
 
-    .card h2 {
-      font-size: 1rem;
-      margin: 0 0 10px;
-      padding-bottom: 6px;
-      border-bottom: 1px solid var(--border-soft);
-    }
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
 
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      margin-bottom: 12px;
-    }
+  .section-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+  }
 
-    .field label {
-      font-size: 0.85rem;
-      color: var(--text-sub);
-    }
+  .section-title {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-mid);
+  }
 
-    .field input[type="number"],
-    .field select {
-      padding: 10px 12px;
-      border-radius: 10px;
-      border: 1px solid var(--border-soft);
-      font-size: 1rem;
-      outline: none;
-      background: #f9fafb;
-    }
+  /* ── FIELD ── */
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
 
-    .field input:focus,
-    .field select:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px var(--accent-soft);
-      background: #ffffff;
-    }
+  .field-label {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+  }
 
-    .note {
-      font-size: 0.8rem;
-      color: var(--text-sub);
-    }
+  /* ── NUMBER INPUT ── */
+  .number-input-wrap {
+    display: flex;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
 
-    .action {
-      margin-top: 16px;
-      text-align: center;
-    }
+  .number-input-wrap:focus-within {
+    border-color: var(--accent);
+  }
 
-    .action button {
-      width: 100%;
-      padding: 12px 16px;
-      border-radius: 999px;
-      border: none;
-      font-size: 1rem;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      color: #ffffff;
-      background: var(--accent);
-      cursor: pointer;
-      box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
-      transition: transform 0.08s ease, box-shadow 0.08s ease,
-        opacity 0.1s ease;
-    }
+  .number-input-wrap button {
+    width: 44px;
+    height: 52px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.1s, color 0.1s;
+    flex-shrink: 0;
+  }
 
-    .action button:active {
-      transform: translateY(1px);
-      box-shadow: 0 6px 14px rgba(37, 99, 235, 0.24);
-      opacity: 0.95;
-    }
+  .number-input-wrap button:hover {
+    background: var(--surface2);
+    color: var(--text);
+  }
 
-    .result-card {
-      margin-top: 16px;
-    }
+  .number-input-wrap input[type="number"] {
+    flex: 1;
+    height: 52px;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 26px;
+    font-weight: 500;
+    text-align: center;
+    outline: none;
+    -moz-appearance: textfield;
+    min-width: 0;
+  }
 
-    .result-card p {
-      margin: 4px 0;
-      font-size: 0.95rem;
-    }
+  .number-input-wrap input[type="number"]::-webkit-inner-spin-button,
+  .number-input-wrap input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+  }
 
-    .result-label {
-      font-size: 0.85rem;
-      color: var(--text-sub);
-      margin-bottom: 2px;
-    }
+  /* ── RADIO CHIPS ── */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
 
-    .result-main {
-      font-weight: 600;
-    }
+  .chips input[type="radio"] { display: none; }
 
-    .fraction {
-      font-size: 0.85rem;
-      color: var(--text-sub);
-    }
+  .chips label {
+    padding: 8px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text-mid);
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
 
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #020617;
-        --card-bg: #0f172a;
-        --text-main: #e5e7eb;
-        --text-sub: #9ca3af;
-        --border-soft: #1f2937;
-        --accent-soft: rgba(37, 99, 235, 0.3);
-      }
+  .chips input[type="radio"]:checked + label {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 
-      body {
-        background: radial-gradient(circle at top, #0b1120, #020617 60%);
-      }
+  .chips label:hover {
+    border-color: var(--border-active);
+    color: var(--text);
+  }
 
-      .card {
-        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
-      }
+  /* ── CUSTOM INPUT ── */
+  .custom-field {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+  }
 
-      .field input[type="number"],
-      .field select {
-        background: #020617;
-        border-color: #1f2937;
-        color: var(--text-main);
-      }
-    }
-  </style>
+  .custom-field.visible { display: flex; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 4px 0;
+  }
+
+  /* ── COMPUTE BUTTON ── */
+  .btn-compute {
+    width: 100%;
+    height: 56px;
+    background: var(--accent);
+    border: none;
+    border-radius: 2px;
+    color: #0e0e0e;
+    font-family: var(--display);
+    font-size: 22px;
+    letter-spacing: 0.12em;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    margin-top: 8px;
+  }
+
+  .btn-compute:hover { opacity: 0.88; }
+  .btn-compute:active { transform: scale(0.99); }
+
+  /* ── RESULT PANEL ── */
+  .result-panel {
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.3s, transform 0.3s;
+  }
+
+  .result-panel.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .result-block {
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .result-block-title {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-mid);
+    font-family: var(--mono);
+    margin-bottom: 2px;
+  }
+
+  /* 総数：小さめ・控えめ */
+  .result-total-line {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    opacity: 0.5;
+  }
+
+  .result-total-line .result-line-label {
+    font-size: 11px;
+  }
+
+  .result-total-line .result-line-value {
+    font-family: var(--mono);
+    font-size: 16px;
+    color: var(--text-mid);
+    letter-spacing: 0.02em;
+  }
+
+  /* 台紙＋バラ セット */
+  .result-set {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    display: flex;
+    overflow: hidden;
+  }
+
+  .result-set-item {
+    flex: 1;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .result-set-item + .result-set-item {
+    border-left: 1px solid var(--border);
+  }
+
+  .result-set-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    color: var(--text-mid);
+    text-transform: uppercase;
+  }
+
+  .result-set-value {
+    font-family: var(--mono);
+    font-size: 32px;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .result-set-value.is-bara {
+    color: var(--accent);
+    font-size: 26px;
+  }
+
+  .result-set-frac {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-mid);
+    letter-spacing: 0.04em;
+    margin-top: 4px;
+  }
+
+  .result-set-unit {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-left: 3px;
+  }
+
+  .result-line-label {
+    font-size: 12px;
+    color: var(--text-mid);
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+  }
+
+  .result-sep {
+    height: 1px;
+    background: var(--border);
+    margin: 0 24px;
+  }
+
+  /* ── ERROR ── */
+  .error-msg {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--red);
+    display: none;
+  }
+
+  .error-msg.visible { display: block; }
+
+  /* ── FOOTER ── */
+  footer {
+    margin-top: 60px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.12em;
+    text-align: center;
+  }
+
+</style>
 </head>
-
 <body>
-  <div class="app">
-    <header class="app-header">
-      <h1>エーオーアイ箱物シール計算</h1>
-      <p class="app-subtitle">外箱1固定／中身2・8・10＋任意対応 By CAPTAIN</p>
-    </header>
 
-    <main>
-      <!-- 基本 -->
-      <section class="card">
-        <h2>基本入力</h2>
-        <div class="field">
-          <label for="totalBoxes">箱の総数</label>
-          <input id="totalBoxes" type="number" inputmode="numeric" value="100" />
-        </div>
-      </section>
+<header>
+  <div class="header-label">AOI LOGISTICS</div>
+  <div class="header-title">LABEL COUNTER</div>
+  <div class="header-sub">外箱1枚固定　中身2 / 8 / 10 + 任意入力対応　分数表示</div>
+</header>
 
-      <!-- 外箱シール -->
-      <section class="card">
-        <h2>外箱用シール</h2>
-        <div class="field">
-          <label>箱あたり枚数</label>
-          <div class="note">1枚固定</div>
-        </div>
-        <div class="field">
-          <label for="outerPerSheet">綴り枚数</label>
-          <select id="outerPerSheet">
-            <option value="12" selected>12枚綴り</option>
-            <option value="10">10枚綴り</option>
-            <option value="9">9枚綴り</option>
-            <option value="8">8枚綴り</option>
-            <option value="">なし</option>
-          </select>
-        </div>
-      </section>
+<main>
 
-      <!-- 中身シール -->
-      <section class="card">
-        <h2>中身用シール</h2>
+  <!-- SECTION 01: 基本 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <span class="section-title">基本設定</span>
+    </div>
 
-        <div class="field">
-          <label for="innerPerBoxSelect">箱あたり枚数（中身）</label>
-          <select id="innerPerBoxSelect">
-            <option value="2" selected>2個入り</option>
-            <option value="8">8個入り</option>
-            <option value="10">10個入り</option>
-            <option value="custom">任意入力</option>
-          </select>
-        </div>
-
-        <div class="field" id="customInnerField" style="display:none;">
-          <label for="innerPerBox">任意の個数</label>
-          <input id="innerPerBox" type="number" inputmode="numeric" value="2" />
-        </div>
-
-        <div class="field">
-          <label for="innerPerSheet">綴り枚数</label>
-          <select id="innerPerSheet">
-            <option value="10" selected>10枚綴り</option>
-            <option value="12">12枚綴り</option>
-            <option value="9">9枚綴り</option>
-            <option value="8">8枚綴り</option>
-          </select>
-        </div>
-
-      </section>
-
-      <div class="action">
-        <button id="calcButton">計算する</button>
+    <div class="field">
+      <div class="field-label">箱の総数</div>
+      <div class="number-input-wrap">
+        <button type="button" onclick="stepNum('boxCount', -1)">−</button>
+        <input type="number" id="boxCount" value="0" min="0" inputmode="numeric">
+        <button type="button" onclick="stepNum('boxCount', 1)">＋</button>
       </div>
-
-      <!-- 結果 -->
-      <section class="card result-card">
-        <h2>結果</h2>
-
-        <p class="result-label">外箱用シール台紙</p>
-        <p class="result-main" id="outerResultMain">0 枚</p>
-        <p class="fraction" id="outerResultSub"></p>
-
-        <p class="result-label" style="margin-top:12px;">中身用シール台紙</p>
-        <p class="result-main" id="innerResultMain">0 枚</p>
-        <p class="fraction" id="innerResultSub"></p>
-      </section>
-    </main>
+      <div class="error-msg" id="err-box">1以上の数を入力してください</div>
+    </div>
   </div>
 
-  <script>
-    const innerSelect = document.getElementById("innerPerBoxSelect");
-    const customField = document.getElementById("customInnerField");
-    const innerInput = document.getElementById("innerPerBox");
+  <!-- SECTION 02: 外箱 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <span class="section-title">外箱用シール</span>
+    </div>
 
-    innerSelect.addEventListener("change", () => {
-      if (innerSelect.value === "custom") {
-        customField.style.display = "block";
-        innerInput.focus();
-      } else {
-        customField.style.display = "none";
-      }
+    <div class="field">
+      <div class="field-label">箱あたり枚数</div>
+      <div style="font-family: var(--mono); font-size:18px; color: var(--text-mid); padding: 4px 0 0;">1 枚固定</div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">綴り枚数</div>
+      <div class="chips" id="outerBinding">
+        <input type="radio" name="outerBinding" id="ob12" value="12" checked>
+        <label for="ob12">12枚綴り</label>
+        <input type="radio" name="outerBinding" id="ob10" value="10">
+        <label for="ob10">10枚綴り</label>
+        <input type="radio" name="outerBinding" id="ob9" value="9">
+        <label for="ob9">9枚綴り</label>
+        <input type="radio" name="outerBinding" id="ob8" value="8">
+        <label for="ob8">8枚綴り</label>
+        <input type="radio" name="outerBinding" id="ob0" value="0">
+        <label for="ob0">なし</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 03: 中身 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <span class="section-title">中身用シール</span>
+    </div>
+
+    <div class="field">
+      <div class="field-label">箱あたり枚数（中身）</div>
+      <div class="chips" id="innerCountChips">
+        <input type="radio" name="innerCount" id="ic2" value="2" checked>
+        <label for="ic2">2個入り</label>
+        <input type="radio" name="innerCount" id="ic8" value="8">
+        <label for="ic8">8個入り</label>
+        <input type="radio" name="innerCount" id="ic10" value="10">
+        <label for="ic10">10個入り</label>
+        <input type="radio" name="innerCount" id="icCustom" value="custom">
+        <label for="icCustom">任意</label>
+      </div>
+
+      <div class="custom-field" id="customCountField">
+        <div class="field-label">任意の個数</div>
+        <div class="number-input-wrap">
+          <button type="button" onclick="stepNum('customCount', -1)">−</button>
+          <input type="number" id="customCount" value="1" min="1" inputmode="numeric">
+          <button type="button" onclick="stepNum('customCount', 1)">＋</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">綴り枚数</div>
+      <div class="chips">
+        <input type="radio" name="innerBinding" id="ib10" value="10" checked>
+        <label for="ib10">10枚綴り</label>
+        <input type="radio" name="innerBinding" id="ib12" value="12">
+        <label for="ib12">12枚綴り</label>
+        <input type="radio" name="innerBinding" id="ib9" value="9">
+        <label for="ib9">9枚綴り</label>
+        <input type="radio" name="innerBinding" id="ib8" value="8">
+        <label for="ib8">8枚綴り</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPUTE -->
+  <button class="btn-compute" onclick="compute()">CALCULATE</button>
+
+  <!-- RESULT -->
+  <div class="result-panel" id="resultPanel">
+
+    <!-- 外箱 -->
+    <div class="result-block">
+      <div class="result-block-title">外箱用シール</div>
+      <div class="result-total-line">
+        <span class="result-line-label">総数</span>
+        <span class="result-line-value" id="res-outer-bara">—</span>
+      </div>
+      <div class="result-set">
+        <div class="result-set-item">
+          <div class="result-set-label">台紙</div>
+          <div class="result-set-value" id="res-outer-daishi">—<span class="result-set-unit">枚</span></div>
+        </div>
+        <div class="result-set-item">
+          <div class="result-set-label">バラ</div>
+          <div class="result-set-value is-bara" id="res-outer-frac">—</div>
+          <div class="result-set-frac" id="res-outer-frac-sub"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-sep"></div>
+
+    <!-- 中身 -->
+    <div class="result-block">
+      <div class="result-block-title">中身用シール</div>
+      <div class="result-total-line">
+        <span class="result-line-label">総数</span>
+        <span class="result-line-value" id="res-inner-bara">—</span>
+      </div>
+      <div class="result-set">
+        <div class="result-set-item">
+          <div class="result-set-label">台紙</div>
+          <div class="result-set-value" id="res-inner-daishi">—<span class="result-set-unit">枚</span></div>
+        </div>
+        <div class="result-set-item">
+          <div class="result-set-label">バラ</div>
+          <div class="result-set-value is-bara" id="res-inner-frac">—</div>
+          <div class="result-set-frac" id="res-inner-frac-sub"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<footer>BY CAPTAIN — AOI LABEL SYSTEM</footer>
+
+<script>
+  // ── ステッパー ──
+  function stepNum(id, delta) {
+    const el = document.getElementById(id);
+    const min = parseInt(el.min) || 0;
+    el.value = Math.max(min, (parseInt(el.value) || 0) + delta);
+  }
+
+  // ── 任意チップ切り替え ──
+  document.querySelectorAll('input[name="innerCount"]').forEach(r => {
+    r.addEventListener('change', () => {
+      const cf = document.getElementById('customCountField');
+      cf.classList.toggle('visible', r.value === 'custom' && r.checked);
     });
+  });
 
-    function computeSheets(totalLabels, perSheet) {
-      if (perSheet <= 0 || totalLabels <= 0) {
-        return { main: "0 枚", sub: "" };
-      }
+  // ── 切り上げ除算 ──
+  function ceilDiv(numerator, denominator) {
+    return Math.ceil(numerator / denominator);
+  }
 
-      const sheets = totalLabels / perSheet;
-      const whole = Math.floor(sheets);
-      const remainderLabels = totalLabels % perSheet;
+  // ── 分数表示 ──
+  function fracLabel(total, binding) {
+    if (!binding) return '';
+    const full = Math.floor(total / binding);
+    const rem  = total % binding;
+    if (rem === 0) return `${full}枚（端数なし）`;
+    return `${full}枚 + ${rem}/${binding}`;
+  }
 
-      if (remainderLabels === 0) {
-        return { main: `${whole} 枚`, sub: "" };
-      }
+  // ── 計算 ──
+  function compute() {
+    const errBox = document.getElementById('err-box');
+    const boxCount = parseInt(document.getElementById('boxCount').value) || 0;
 
-      const decimal = sheets.toFixed(3).replace(/\.?0+$/, "");
-
-      return {
-        main: `${whole} 枚 と ${remainderLabels}/${perSheet} 枚`,
-        sub: `= 約 ${decimal} 枚（綴り${perSheet}枚基準）`
-      };
+    if (boxCount <= 0) {
+      errBox.classList.add('visible');
+      return;
     }
+    errBox.classList.remove('visible');
 
-    document.getElementById("calcButton").addEventListener("click", () => {
-      const total = Number(document.getElementById("totalBoxes").value) || 0;
+    // 外箱
+    const outerTotal = boxCount * 1;
+    const outerBinding = parseInt(document.querySelector('input[name="outerBinding"]:checked').value);
 
-      const outerSheetValue = document.getElementById("outerPerSheet").value;
-      if (outerSheetValue === "") {
-        document.getElementById("outerResultMain").textContent = "0 枚";
-        document.getElementById("outerResultSub").textContent = "";
-      } else {
-        const outerTotalLabels = total * 1;
-        const outer = computeSheets(outerTotalLabels, Number(outerSheetValue));
-        document.getElementById("outerResultMain").textContent = outer.main;
-        document.getElementById("outerResultSub").textContent = outer.sub;
-      }
+    // 中身
+    const innerVal = document.querySelector('input[name="innerCount"]:checked').value;
+    const innerPer = innerVal === 'custom'
+      ? (parseInt(document.getElementById('customCount').value) || 1)
+      : parseInt(innerVal);
+    const innerTotal = boxCount * innerPer;
+    const innerBinding = parseInt(document.querySelector('input[name="innerBinding"]:checked').value);
 
-      let innerPerBox;
-      if (innerSelect.value === "custom") {
-        innerPerBox = Number(innerInput.value) || 0;
-      } else {
-        innerPerBox = Number(innerSelect.value);
-      }
+    // 台紙・端数
+    const outerSheets = outerBinding > 0 ? Math.ceil(outerTotal / outerBinding) : 0;
+    const outerRem    = outerBinding > 0 ? outerTotal % outerBinding : 0;
+    const innerSheets = Math.ceil(innerTotal / innerBinding);
+    const innerRem    = innerTotal % innerBinding;
 
-      const innerTotalLabels = total * innerPerBox;
-      const innerPerSheet = Number(document.getElementById("innerPerSheet").value) || 10;
-      const inner = computeSheets(innerTotalLabels, innerPerSheet);
+    // 外箱表示
+    document.getElementById('res-outer-bara').textContent     = `${outerTotal} 枚`;
+    document.getElementById('res-outer-daishi').innerHTML     = outerBinding > 0
+      ? `${outerSheets}<span class="result-set-unit">枚</span>`
+      : `—<span class="result-set-unit">（なし）</span>`;
+    document.getElementById('res-outer-frac').textContent     = outerBinding > 0 ? `${outerRem} 枚` : '—';
+    document.getElementById('res-outer-frac-sub').textContent = outerBinding > 0 ? `${outerRem} ／ ${outerBinding}` : '';
 
-      document.getElementById("innerResultMain").textContent = inner.main;
-      document.getElementById("innerResultSub").textContent = inner.sub;
-    });
-  </script>
+    // 中身表示
+    document.getElementById('res-inner-bara').textContent     = `${innerTotal} 枚`;
+    document.getElementById('res-inner-daishi').innerHTML     = `${innerSheets}<span class="result-set-unit">枚</span>`;
+    document.getElementById('res-inner-frac').textContent     = `${innerRem} 枚`;
+    document.getElementById('res-inner-frac-sub').textContent = `${innerRem} ／ ${innerBinding}`;
+
+    // パネル表示
+    const panel = document.getElementById('resultPanel');
+    panel.classList.add('visible');
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // Enter キー対応
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') compute();
+  });
+</script>
 </body>
 </html>
